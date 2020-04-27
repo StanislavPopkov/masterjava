@@ -10,7 +10,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the ru.javaops.masterjava.xml.schema package. 
+ * generated in the shema2 package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -27,10 +27,26 @@ public class ObjectFactory {
     private final static QName _City_QNAME = new QName("http://javaops.ru", "City");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: ru.javaops.masterjava.xml.schema
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: shema2
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link Project }
+     * 
+     */
+    public Project createProject() {
+        return new Project();
+    }
+
+    /**
+     * Create an instance of {@link User }
+     * 
+     */
+    public User createUser() {
+        return new User();
     }
 
     /**
@@ -42,11 +58,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link User }
+     * Create an instance of {@link Project.GroupList }
      * 
      */
-    public User createUser() {
-        return new User();
+    public Project.GroupList createProjectGroupList() {
+        return new Project.GroupList();
+    }
+
+    /**
+     * Create an instance of {@link Group }
+     * 
+     */
+    public Group createGroup() {
+        return new Group();
+    }
+
+    /**
+     * Create an instance of {@link User.GroupList }
+     * 
+     */
+    public User.GroupList createUserGroupList() {
+        return new User.GroupList();
     }
 
     /**
@@ -63,6 +95,14 @@ public class ObjectFactory {
      */
     public Payload.Users createPayloadUsers() {
         return new Payload.Users();
+    }
+
+    /**
+     * Create an instance of {@link Payload.Projects }
+     * 
+     */
+    public Payload.Projects createPayloadProjects() {
+        return new Payload.Projects();
     }
 
     /**
