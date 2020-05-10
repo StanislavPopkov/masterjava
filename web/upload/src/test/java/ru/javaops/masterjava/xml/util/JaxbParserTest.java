@@ -6,6 +6,7 @@ import ru.javaops.masterjava.xml.schema.CityType;
 import ru.javaops.masterjava.xml.schema.ObjectFactory;
 import ru.javaops.masterjava.xml.schema.Payload;
 
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
