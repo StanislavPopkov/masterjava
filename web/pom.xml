@@ -32,6 +32,5 @@
     <modules>
         <module>upload</module>
         <module>webapp</module>
-        <module>mail-service</module>
     </modules>
 </project>
