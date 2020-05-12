@@ -17,8 +17,8 @@ import java.io.*;
  */
 public class JaxbParser {
 
-    protected JaxbMarshaller jaxbMarshaller;
-    protected JaxbUnmarshaller jaxbUnmarshaller;
+    ThreadLocal<JaxbMarshaller> threadLocalM;
+    ThreadLocal<JaxbUnmarshaller> threadLocalU;
     protected Schema schema;
 
     public JaxbParser(Class... classesToBeBound) {
@@ -39,48 +39,50 @@ public class JaxbParser {
     }
 
     private void init(JAXBContext ctx) throws JAXBException {
-        jaxbMarshaller = new JaxbMarshaller(ctx);
-        jaxbUnmarshaller = new JaxbUnmarshaller(ctx);
+        threadLocalM = new ThreadLocal<>();
+        threadLocalM.set(new JaxbMarshaller(ctx));
+        threadLocalU = new ThreadLocal<>();
+        threadLocalU.set(new JaxbUnmarshaller(ctx));
     }
 
     // Unmarshaller
     public <T> T unmarshal(InputStream is) throws JAXBException {
-        return (T) jaxbUnmarshaller.unmarshal(is);
+        return (T) threadLocalU.get().unmarshal(is);
     }
 
     public <T> T unmarshal(Reader reader) throws JAXBException {
-        return (T) jaxbUnmarshaller.unmarshal(reader);
+        return (T) threadLocalU.get().unmarshal(reader);
     }
 
     public <T> T unmarshal(String str) throws JAXBException {
-        return (T) jaxbUnmarshaller.unmarshal(str);
+        return (T) threadLocalU.get().unmarshal(str);
     }
 
     public <T> T unmarshal(XMLStreamReader reader, Class<T> elementClass) throws JAXBException {
-        return jaxbUnmarshaller.unmarshal(reader, elementClass);
+        return threadLocalU.get().unmarshal(reader, elementClass);
     }
 
     // Marshaller
     public void setMarshallerProperty(String prop, Object value) {
         try {
-            jaxbMarshaller.setProperty(prop, value);
+            threadLocalM.get().setProperty(prop, value);
         } catch (PropertyException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
     public String marshal(Object instance) throws JAXBException {
-        return jaxbMarshaller.marshal(instance);
+        return threadLocalM.get().marshal(instance);
     }
 
     public void marshal(Object instance, Writer writer) throws JAXBException {
-        jaxbMarshaller.marshal(instance, writer);
+        threadLocalM.get().marshal(instance, writer);
     }
 
     public void setSchema(Schema schema) {
         this.schema = schema;
-        jaxbUnmarshaller.setSchema(schema);
-        jaxbMarshaller.setSchema(schema);
+        threadLocalU.get().setSchema(schema);
+        threadLocalM.get().setSchema(schema);
     }
 
     public void validate(String str) throws IOException, SAXException {
