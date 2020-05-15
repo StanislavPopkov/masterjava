@@ -3,6 +3,12 @@
 ## [Программа проекта](#Программа-проекта-1)
 ### [Изменения проекта (Release Notes)](ReleaseNotes.md)
 
+### mvn dependencies
+- -X dependency:tree
+- project-info-reports:dependencies
+- project-info-reports:dependency-convergence
+- mvn -DincludeScope=runtime dependency:copy-dependencies
+
 ### _Разработка полнофункционального многомодульного Maven проекта_
 #### состоящего из 3-х веб приложений:
 

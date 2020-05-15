@@ -64,6 +64,12 @@
         <groupId>org.openjdk.jmh</groupId>
         <artifactId>jmh-generator-annprocess</artifactId>
         <version>RELEASE</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+            </exclusion>
+        </exclusions>
         <scope>provided</scope>
     </dependency>
     </dependencies>
