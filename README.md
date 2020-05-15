@@ -7,7 +7,8 @@
 - -X dependency:tree
 - project-info-reports:dependencies
 - project-info-reports:dependency-convergence
-- mvn -DincludeScope=runtime dependency:copy-dependencies
+- mvn -DincludeScope=runtime dependency:copy-dependencies & jar-hell.zip, in cmd: java -jar guava-21.0.jar .
+
 
 ### _Разработка полнофункционального многомодульного Maven проекта_
 #### состоящего из 3-х веб приложений:
