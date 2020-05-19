@@ -1,7 +1,9 @@
 package ru.javaops.masterjava.upload;
 
 import org.thymeleaf.context.WebContext;
+import ru.javaops.masterjava.UploadService;
 import ru.javaops.masterjava.persist.model.User;
+import ru.javaops.masterjava.service.UploadServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -20,7 +22,8 @@ import static ru.javaops.masterjava.common.web.ThymeleafListener.engine;
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 10) //10 MB in memory limit
 public class UploadServlet extends HttpServlet {
 
-    private final UserProcessor userProcessor = new UserProcessor();
+
+    private final UploadService uploadService = new UploadServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -39,7 +42,8 @@ public class UploadServlet extends HttpServlet {
                 throw new IllegalStateException("Upload file have not been selected");
             }
             try (InputStream is = filePart.getInputStream()) {
-                List<User> users = userProcessor.process(is);
+                int chunkNumber = Integer.parseInt(req.getParameter("number"));
+                List<User> users = uploadService.getXMLData(is, chunkNumber);
                 webContext.setVariable("users", users);
                 engine.process("result", webContext, resp.getWriter());
             }
