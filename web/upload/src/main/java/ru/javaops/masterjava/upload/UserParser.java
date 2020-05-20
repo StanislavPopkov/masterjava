@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserProcessor {
+public class UserParser {
     private static final JaxbParser jaxbParser = new JaxbParser(ObjectFactory.class);
 
     public List<User> process(final InputStream is) throws XMLStreamException, JAXBException {

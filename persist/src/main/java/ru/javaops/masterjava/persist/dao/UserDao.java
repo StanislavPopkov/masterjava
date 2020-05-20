@@ -44,25 +44,29 @@ public abstract class UserDao implements AbstractDao {
     @Override
     public abstract void clean();
 
-    public int insertBatchChunkNumber(List<User> userList, int chunkNumber) {
+    public int[] insertBatchChunkNumber(List<User> userList, int chunkNumber) {
         Handle handle = DBIProvider.getDBI().open();
         PreparedBatch batch = handle.prepareBatch("INSERT INTO users (full_name, email, flag) VALUES (:fullName, :email, " +
                 "CAST(:flag AS user_flag)) ON CONFLICT (email) DO NOTHING");
         int j = 0;
-        int result = 0;
+        int [] result = new int[userList.size()];
+        int [] firstInsert = null;
+        int [] secondInsert = null;
         try {
             for (User user : userList) {
                 batch.bind("fullName", user.getFullName()).bind("email", user.getEmail())
                         .bind("flag", user.getFlag()).add();
                 j++;
                 if (j == userList.size() || j == chunkNumber) {
-                    result = batch.execute().length;
+                    firstInsert = batch.execute();
                     j = 0;
                 }
             }
             if (batch.getSize() != 0) {
-                result += batch.execute().length;
+                secondInsert = batch.execute();
             }
+            System.arraycopy(firstInsert, 0, result, 0, firstInsert.length);
+            System.arraycopy(secondInsert, 0, result, firstInsert.length+1, secondInsert.length);
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {
