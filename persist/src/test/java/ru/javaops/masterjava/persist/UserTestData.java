@@ -1,10 +1,14 @@
 package ru.javaops.masterjava.persist;
 
 import com.google.common.collect.ImmutableList;
+import ru.javaops.masterjava.persist.dao.CityDao;
+import ru.javaops.masterjava.persist.dao.CityTestData;
 import ru.javaops.masterjava.persist.dao.UserDao;
+import ru.javaops.masterjava.persist.model.City;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.model.UserFlag;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class UserTestData {
@@ -17,20 +21,22 @@ public class UserTestData {
     public static List<User> FIST5_USERS;
 
     public static void init() {
-        ADMIN = new User("Admin", "admin@javaops.ru", UserFlag.superuser);
-        DELETED = new User("Deleted", "deleted@yandex.ru", UserFlag.deleted);
-        FULL_NAME = new User("Full Name", "gmail@gmail.com", UserFlag.active);
-        USER1 = new User("User1", "user1@gmail.com", UserFlag.active);
-        USER2 = new User("User2", "user2@yandex.ru", UserFlag.active);
-        USER3 = new User("User3", "user3@yandex.ru", UserFlag.active);
-        FIST5_USERS = ImmutableList.of(ADMIN, DELETED, FULL_NAME, USER1, USER2);
+        ADMIN = new User("Admin", "admin@javaops.ru", UserFlag.superuser, 1);
+        DELETED = new User("Deleted", "deleted@yandex.ru", UserFlag.deleted, 1);
+        FULL_NAME = new User("Full Name", "gmail@gmail.com", UserFlag.active, 1);
+        USER1 = new User("User1", "user1@gmail.com", UserFlag.active, 0);
+        USER2 = new User("User2", "user2@yandex.ru", UserFlag.active, 0);
+        USER3 = new User("User3", "user3@yandex.ru", UserFlag.active, 0);
+        FIST5_USERS = Arrays.asList(ADMIN, DELETED, FULL_NAME, USER1, USER2);
     }
 
     public static void setUp() {
         UserDao dao = DBIProvider.getDao(UserDao.class);
         dao.clean();
+        Integer cityId = CityTestData.CITY.getId();
         DBIProvider.getDBI().useTransaction((conn, status) -> {
-            FIST5_USERS.forEach(dao::insert);
+            FIST5_USERS.stream().peek(user -> user.setCityId(cityId)).forEach(dao::insert);
+            USER3.setCityId(cityId);
             dao.insert(USER3);
         });
     }

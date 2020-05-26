@@ -19,11 +19,13 @@ public class UserDaoTest extends AbstractDaoTest<UserDao> {
 
     @BeforeClass
     public static void init() throws Exception {
+        CityTestData.init();
         UserTestData.init();
     }
 
     @Before
     public void setUp() throws Exception {
+        CityTestData.setUp();
         UserTestData.setUp();
     }
 

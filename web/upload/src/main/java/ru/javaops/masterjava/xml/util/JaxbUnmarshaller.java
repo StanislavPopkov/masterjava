@@ -35,4 +35,8 @@ public class JaxbUnmarshaller {
     public <T> T unmarshal(XMLStreamReader reader, Class<T> elementClass) throws JAXBException {
         return unmarshaller.unmarshal(reader, elementClass).getValue();
     }
+
+    public <T> T unmarshal(XMLStreamReader reader) throws JAXBException {
+        return (T) unmarshaller.unmarshal(reader);
+    }
 }

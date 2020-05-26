@@ -1,10 +1,14 @@
-package ru.javaops.masterjava.upload;
+package ru.javaops.masterjava.processors;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import ru.javaops.masterjava.model.Agregator;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.UserDao;
+import ru.javaops.masterjava.persist.model.City;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.model.UserFlag;
 import ru.javaops.masterjava.xml.schema.ObjectFactory;
@@ -14,11 +18,8 @@ import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,19 +48,32 @@ public class UserProcessor {
     /*
      * return failed users chunks
      */
-    public List<FailedEmails> process(final InputStream is, int chunkSize) throws XMLStreamException, JAXBException {
+    public List<FailedEmails> process(final byte[] bytes, int chunkSize, List<City> cities, Agregator agregator) throws XMLStreamException, JAXBException {
         log.info("Start processing with chunkSize=" + chunkSize);
 
         Map<String, Future<List<String>>> chunkFutures = new LinkedHashMap<>();  // ordered map (emailRange -> chunk future)
 
+        Multimap<Integer, String> map = ArrayListMultimap.create();
         int id = userDao.getSeqAndSkip(chunkSize);
         List<User> chunk = new ArrayList<>(chunkSize);
-        val processor = new StaxStreamProcessor(is);
+        val processor = new StaxStreamProcessor(new ByteArrayInputStream(bytes));
         val unmarshaller = jaxbParser.createUnmarshaller();
 
         while (processor.doUntil(XMLEvent.START_ELEMENT, "User")) {
-            ru.javaops.masterjava.xml.schema.User xmlUser = unmarshaller.unmarshal(processor.getReader(), ru.javaops.masterjava.xml.schema.User.class);
-            final User user = new User(id++, xmlUser.getValue(), xmlUser.getEmail(), UserFlag.valueOf(xmlUser.getFlag().value()));
+            String cityRef = processor.getAttribute("city");
+            String groupRefs = processor.getAttribute("groupRefs");
+            ru.javaops.masterjava.xml.schema.User xmlUser = unmarshaller.unmarshal(processor.getReader());
+
+            Integer cityIdFromBase = cities.stream().filter(city -> cityRef.equals(city.getShortName()))
+                    .mapToInt(city -> city.getId()).findFirst().orElseThrow(() -> new NoSuchElementException(String.format("City with shortName %s not found", cityRef)));
+            final User user = new User(id, xmlUser.getValue(), xmlUser.getEmail(), UserFlag.valueOf(xmlUser.getFlag().value()), cityIdFromBase);
+
+            if (groupRefs != null) {
+                List<String> groupList = new ArrayList<>(Arrays.asList(groupRefs.split("\\s+")));
+                map.putAll(id, groupList);
+            }
+            id++;
+
             chunk.add(user);
             if (chunk.size() == chunkSize) {
                 addChunkFutures(chunkFutures, chunk);
@@ -67,6 +81,8 @@ public class UserProcessor {
                 id = userDao.getSeqAndSkip(chunkSize);
             }
         }
+        agregator.setUserGroupMap(map);
+
 
         if (!chunk.isEmpty()) {
             addChunkFutures(chunkFutures, chunk);
