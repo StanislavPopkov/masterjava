@@ -1,6 +1,10 @@
 package ru.javaops.masterjava.service.mail;
 
+import com.typesafe.config.Config;
+import ru.javaops.masterjava.config.Configs;
+import ru.javaops.masterjava.persist.DBIProvider;
 import javax.xml.ws.Endpoint;
+import java.sql.DriverManager;
 
 /**
  * User: gkislin
@@ -9,6 +13,23 @@ import javax.xml.ws.Endpoint;
 public class MailServicePublisher {
 
     public static void main(String[] args) {
+        initDBI();
         Endpoint.publish("http://localhost:8080/mail/mailService", new MailServiceImpl());
+    }
+
+    public static void initDBI() {
+        Config db = Configs.getConfig("persist.conf","db");
+        initDBI(db.getString("url"), db.getString("user"), db.getString("password"));
+    }
+
+    public static void initDBI(String dbUrl, String dbUser, String dbPassword) {
+        DBIProvider.init(() -> {
+            try {
+                Class.forName("org.postgresql.Driver");
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException("PostgreSQL driver not found", e);
+            }
+            return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+        });
     }
 }

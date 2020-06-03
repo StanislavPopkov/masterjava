@@ -62,4 +62,7 @@ public abstract class UserDao implements AbstractDao {
                 .mapToObj(index -> users.get(index).getEmail())
                 .toList();
     }
+
+    @SqlQuery("SELECT id FROM users WHERE email = :it")
+    public abstract int getByName(@Bind String userEmail);
 }

@@ -32,3 +32,10 @@ CREATE TABLE user_group (
   group_id INTEGER NOT NULL REFERENCES groups (id),
   CONSTRAINT users_group_idx UNIQUE (user_id, group_id)
 );
+
+--changeset spopkov:1
+CREATE TABLE mail_result (
+  id         INTEGER PRIMARY KEY DEFAULT nextval('common_seq'),
+  email       TEXT NOT NULL,
+  result      TEXT NOT NULL
+);
