@@ -4,6 +4,8 @@
     <title>Users</title>
 </head>
 <body>
+
+<form th:action="@{/}" method="post">
 <table border="1" cellpadding="8" cellspacing="0">
     <thead>
     <tr>
@@ -11,6 +13,7 @@
         <th>Full Name</th>
         <th>Email</th>
         <th>Flag</th>
+        <th>Send email</th>
     </tr>
     </thead>
     <tbody>
@@ -20,8 +23,23 @@
         <td th:text="${user.fullName}"></td>
         <td th:utext="${user.email}"></td>
         <td th:text="${user.flag}"></td>
+        <td><input
+                type="checkbox"
+                name="sendEmail"
+                th:value="${user.email}+' '+${user.fullName}"/></td>
     </tr>
     </tbody>
 </table>
+    <h3>Send email to users</h3>
+    <p>
+        <label>Subject:</label>
+        <input type="text" name="subject" required/><br/><br/>
+        <label>Body:</label>
+        <input type="text" name="body" required/><br/><br/>
+    </p>
+    <p>
+        <button type="submit" class="btn btn-success">Send</button>
+    </p>
+</form>
 </body>
 </html>
