@@ -64,10 +64,10 @@
 
         <resources>
             <resource>
-                <directory>${masterjava.config}/wsdl</directory>
+                <directory>${masterjava.config}</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>mailService.wsdl</include>
+                    <include>wsdl/mailService.wsdl</include>
                 </includes>
             </resource>
             <resource>
