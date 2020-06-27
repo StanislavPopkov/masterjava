@@ -1,6 +1,7 @@
 package ru.javaops.masterjava.service.mail;
 
 import com.google.common.collect.ImmutableSet;
+import ru.javaops.web.WebStateException;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -9,7 +10,7 @@ import java.net.URL;
 
 public class MailServiceClient {
 
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args) throws MalformedURLException, WebStateException {
         Service service = Service.create(
                 new URL("http://localhost:8080/mail/mailService?wsdl"),
                 new QName("http://mail.javaops.ru/", "MailServiceImplService"));
@@ -21,7 +22,7 @@ public class MailServiceClient {
         System.out.println("Group mail state: " + state);
 
         GroupResult groupResult = mailService.sendBulk(ImmutableSet.of(
-                new Addressee("Мастер Java <masterjava@javaops.ru>"),
+                new Addressee("Мастер Java <st.popkov@gmail.com>"),
                 new Addressee("Bad Email <bad_email.ru>")), "Bulk mail subject", "Bulk mail body");
         System.out.println("\nBulk mail groupResult:\n" + groupResult);
     }
